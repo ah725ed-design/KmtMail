@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.ContactPhone
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Domain
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -51,17 +52,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +92,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
 
     val isArabic = uiState.language == AppLanguage.ARABIC
-    val availableDomains = listOf("kmtmail.com", "tempinbox.org", "disposable.io", "quickmail.net")
+    val providerOptions = listOf("Auto", "Mail.tm", "Mail.gw", "1SecMail", "Temp-Mail")
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -111,11 +109,9 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.kmtmail_app_icon_1785403375720),
+                            painter = painterResource(id = R.drawable.ic_kmtmail_logo),
                             contentDescription = "KmtMail Logo",
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                            modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
@@ -145,6 +141,152 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             item { Spacer(modifier = Modifier.height(4.dp)) }
+
+            // Preferred Provider Section
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = DarkCard)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Dns,
+                                contentDescription = null,
+                                tint = PrimaryBlue,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = if (isArabic) "مزود البريد المفضل" else "Preferred Provider",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextWhite
+                                )
+                                Text(
+                                    text = if (uiState.preferredProvider == "Auto")
+                                        (if (isArabic) "التبديل التلقائي مفعل (Automatic Failover)" else "Automatic Failover enabled")
+                                    else
+                                        (if (isArabic) "المزود الحالي: ${uiState.preferredProvider}" else "Current provider: ${uiState.preferredProvider}"),
+                                    fontSize = 12.sp,
+                                    color = TextMuted
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        providerOptions.forEach { provider ->
+                            val isSelected = uiState.preferredProvider.equals(provider, ignoreCase = true)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .clickable {
+                                        viewModel.setPreferredProvider(provider)
+                                    }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = isSelected,
+                                    onClick = { viewModel.setPreferredProvider(provider) },
+                                    colors = RadioButtonDefaults.colors(selectedColor = PrimaryBlue)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = when (provider) {
+                                        "Auto" -> if (isArabic) "○ Auto (تلقائي مع التبديل السريع)" else "○ Auto (Automatic Failover)"
+                                        else -> "○ $provider"
+                                    },
+                                    fontSize = 15.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) PrimaryBlue else TextWhite
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Dynamic Domains Section (Real Provider Domains)
+            if (uiState.availableDomains.isNotEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = DarkCard)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Domain,
+                                    contentDescription = null,
+                                    tint = PrimaryBlue,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = if (isArabic) "النطاقات المتاحة من المزود" else "Provider Dynamic Domains",
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextWhite
+                                    )
+                                    Text(
+                                        text = if (isArabic) "يتم جلب هذه النطاقات مباشرة من API" else "Fetched live from active provider API",
+                                        fontSize = 12.sp,
+                                        color = TextMuted
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            uiState.availableDomains.take(6).forEach { domain ->
+                                val isSelected = (uiState.selectedDomain == domain)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .clickable {
+                                            viewModel.generateNewAddress(domain)
+                                        }
+                                        .padding(vertical = 8.dp, horizontal = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = isSelected,
+                                        onClick = { viewModel.generateNewAddress(domain) },
+                                        colors = RadioButtonDefaults.colors(selectedColor = PrimaryBlue)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "@$domain",
+                                        fontSize = 15.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isSelected) PrimaryBlue else TextWhite
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // Language Preference
             item {
@@ -225,273 +367,9 @@ fun SettingsScreen(
                 }
             }
 
-            // Dark Mode Section
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = DarkCard)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.DarkMode,
-                                contentDescription = null,
-                                tint = PrimaryBlue,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = if (isArabic) "الوضع الداكن" else "Dark Mode",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextWhite
-                                )
-                                Text(
-                                    text = if (isArabic) "مفعل لحماية العين" else "Always dark theme enabled",
-                                    fontSize = 12.sp,
-                                    color = TextMuted
-                                )
-                            }
-                        }
 
-                        Switch(
-                            checked = uiState.isDarkMode,
-                            onCheckedChange = { viewModel.setDarkMode(it) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color(0xFF0B0F17),
-                                checkedTrackColor = PrimaryBlue
-                            )
-                        )
-                    }
-                }
-            }
 
-            // Quick Actions: Generate New Address & Clear Inbox
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = DarkCard)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                viewModel.generateNewAddress()
-                                Toast.makeText(context, if (isArabic) "تم إنشاء عنوان جديد" else "New address generated", Toast.LENGTH_SHORT).show()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue, contentColor = Color(0xFF0B0F17))
-                        ) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = if (isArabic) "إنشاء عنوان جديد" else "Generate New Address", fontWeight = FontWeight.Bold)
-                        }
 
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.clearInbox()
-                                Toast.makeText(context, if (isArabic) "تم مسح البريد الوارد" else "Inbox cleared", Toast.LENGTH_SHORT).show()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, AccentRed),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentRed)
-                        ) {
-                            Icon(imageVector = Icons.Default.ClearAll, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = if (isArabic) "مسح البريد الوارد" else "Clear Inbox", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-
-            // Domain Preference Section
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = DarkCard)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Domain,
-                                contentDescription = null,
-                                tint = PrimaryBlue,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = if (isArabic) "النطاق المفضل" else "Preferred Domain",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextWhite
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        availableDomains.forEach { domain ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable {
-                                        viewModel.generateNewAddress(domain)
-                                    }
-                                    .padding(vertical = 8.dp, horizontal = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = (uiState.selectedDomain == domain),
-                                    onClick = { viewModel.generateNewAddress(domain) },
-                                    colors = RadioButtonDefaults.colors(selectedColor = PrimaryBlue)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "@$domain",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = TextWhite
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Address History Section
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, SurfaceBorder, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = DarkCard)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = null,
-                                tint = PrimaryBlue,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = if (isArabic) "سجل العناوين السابقة" else "Recent Address History",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextWhite
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        if (history.isEmpty()) {
-                            Text(
-                                text = if (isArabic) "لا يوجد سجل عناوين بعد." else "No address history yet.",
-                                fontSize = 13.sp,
-                                color = TextMuted
-                            )
-                        } else {
-                            history.take(5).forEach { item ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(if (item.isCurrent) SecondaryBlue.copy(alpha = 0.2f) else Color.Transparent)
-                                        .clickable {
-                                            scope.launch {
-                                                repository.switchEmail(item.address)
-                                                Toast.makeText(context, if (isArabic) "تم الانتقال إلى ${item.address}" else "Switched to ${item.address}", Toast.LENGTH_SHORT).show()
-                                                onBackClick()
-                                            }
-                                        }
-                                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = item.address,
-                                            fontSize = 14.sp,
-                                            fontWeight = if (item.isCurrent) FontWeight.Bold else FontWeight.Normal,
-                                            color = if (item.isCurrent) PrimaryBlue else TextWhite
-                                        )
-                                    }
-
-                                    if (item.isCurrent) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clip(CircleShape)
-                                                .background(PrimaryBlue),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = "Active",
-                                                tint = DarkBackground,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    } else {
-                                        IconButton(
-                                            onClick = {
-                                                scope.launch {
-                                                    repository.deleteEmailHistory(item.address)
-                                                }
-                                            },
-                                            modifier = Modifier.size(28.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = "Delete",
-                                                tint = TextMuted,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
-                        }
-                    }
-                }
-            }
 
             // Contact Developer Card
             item {
@@ -585,9 +463,9 @@ fun SettingsScreen(
 
                         Text(
                             text = if (isArabic)
-                                "KmtMail الإصدار v1.0.0\nخدمة بريد مؤقتة وآمنة وسريعة بدون تتبع. مصمم بأحدث تقنيات Jetpack Compose و Modern Android Clean Architecture."
+                                "KmtMail الإصدار v1.0.0\nخدمة بريد مؤقتة حقيقية وآمنة بدون محاكاة أو بيانات وهمية. متكامل مع مزودي Mail.tm و Mail.gw و 1SecMail و Temp-Mail مع نظام Automatic Failover تلقائي."
                             else
-                                "KmtMail v1.0.0\nSecure, instant, anonymous temporary email service with resilient multi-provider fallback. Built with Kotlin, Jetpack Compose, Material Design 3, and Room Database.",
+                                "KmtMail v1.0.0\nReal production temporary email service powered by Mail.tm, Mail.gw, 1SecMail & Temp-Mail APIs with automatic failover.",
                             fontSize = 13.sp,
                             color = TextMuted,
                             lineHeight = 20.sp

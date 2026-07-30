@@ -3,7 +3,6 @@ package com.example.ui.home
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.local.EmailHistoryEntity
 import com.example.data.local.MessageEntity
 import com.example.data.repository.KmtMailRepository
 import kotlinx.coroutines.Job
@@ -24,10 +23,13 @@ data class HomeUiState(
     val messages: List<MessageEntity> = emptyList(),
     val isRefreshing: Boolean = false,
     val autoRefreshCountdown: Int = 10,
-    val selectedDomain: String = "kmtmail.com",
+    val selectedDomain: String = "",
+    val availableDomains: List<String> = emptyList(),
+    val preferredProvider: String = "Auto",
     val language: AppLanguage = AppLanguage.ARABIC,
     val isDarkMode: Boolean = true,
-    val activeProviderName: String = "Mail.tm API"
+    val activeProviderName: String = "Mail.tm",
+    val errorMessage: String? = null
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -42,20 +44,50 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         observeCurrentEmail()
         observeActiveProvider()
+        observePreferredProvider()
+        loadDynamicDomains()
     }
 
     private fun observeActiveProvider() {
         viewModelScope.launch {
             repository.activeProviderNameFlow.collectLatest { name ->
                 _uiState.value = _uiState.value.copy(activeProviderName = name)
+                loadDynamicDomains()
             }
         }
+    }
+
+    private fun observePreferredProvider() {
+        viewModelScope.launch {
+            repository.selectedProviderPreferenceFlow.collectLatest { pref ->
+                _uiState.value = _uiState.value.copy(preferredProvider = pref)
+            }
+        }
+    }
+
+    fun loadDynamicDomains() {
+        viewModelScope.launch {
+            val domains = repository.getDynamicDomains()
+            _uiState.value = _uiState.value.copy(
+                availableDomains = domains,
+                selectedDomain = if (domains.isNotEmpty()) domains.first() else _uiState.value.selectedDomain
+            )
+        }
+    }
+
+    fun setPreferredProvider(providerName: String) {
+        repository.setPreferredProvider(providerName)
+        _uiState.value = _uiState.value.copy(preferredProvider = providerName)
+        loadDynamicDomains()
     }
 
     private fun observeCurrentEmail() {
         viewModelScope.launch {
             repository.currentEmailFlow.collectLatest { historyEntity ->
-                if (historyEntity == null) {
+                if (historyEntity == null || historyEntity.address.startsWith("kmt_")) {
+                    if (historyEntity?.address?.startsWith("kmt_") == true) {
+                        repository.deleteEmailHistory(historyEntity.address)
+                    }
                     generateNewAddress()
                 } else {
                     _uiState.value = _uiState.value.copy(
@@ -85,15 +117,25 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = _uiState.value.copy(isDarkMode = enabled)
     }
 
-    fun generateNewAddress(preferredDomain: String = _uiState.value.selectedDomain) {
+    fun generateNewAddress(preferredDomain: String? = _uiState.value.selectedDomain.ifBlank { null }) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRefreshing = true)
-            val newAddress = repository.generateNewEmail(preferredDomain)
-            _uiState.value = _uiState.value.copy(
-                currentEmail = newAddress,
-                isRefreshing = false,
-                autoRefreshCountdown = 10
-            )
+            _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
+            val result = repository.generateNewEmail(preferredDomain)
+            if (result.isSuccess) {
+                val newAddress = result.getOrNull() ?: ""
+                _uiState.value = _uiState.value.copy(
+                    currentEmail = newAddress,
+                    isRefreshing = false,
+                    autoRefreshCountdown = 10,
+                    errorMessage = null
+                )
+            } else {
+                val err = result.exceptionOrNull()?.message ?: "جميع مزودي البريد غير متاحين حالياً"
+                _uiState.value = _uiState.value.copy(
+                    isRefreshing = false,
+                    errorMessage = err
+                )
+            }
             startAutoRefreshTimer()
         }
     }
@@ -103,13 +145,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         if (email.isBlank()) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRefreshing = true)
-            repository.fetchAndSyncMessages(email)
+            _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
+            val syncResult = repository.fetchAndSyncMessages(email)
+            val err = if (syncResult.isFailure) syncResult.exceptionOrNull()?.message else null
             _uiState.value = _uiState.value.copy(
                 isRefreshing = false,
-                autoRefreshCountdown = 10
+                autoRefreshCountdown = 10,
+                errorMessage = err
             )
         }
+    }
+
+    fun clearErrorMessage() {
+        _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
     fun deleteMessage(id: String) {

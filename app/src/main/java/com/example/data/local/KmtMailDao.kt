@@ -29,8 +29,14 @@ interface KmtMailDao {
     @Query("DELETE FROM messages WHERE id = :id")
     suspend fun deleteMessage(id: String)
 
-    @Query("DELETE FROM messages WHERE id NOT LIKE '1secmail_%' AND id NOT LIKE 'mailtm_%'")
+    @Query("DELETE FROM messages WHERE id NOT LIKE '1secmail_%' AND id NOT LIKE 'mailtm_%' AND id NOT LIKE 'mailgw_%' AND id NOT LIKE 'tempmail_%'")
     suspend fun purgeNonApiMessages()
+
+    @Query("DELETE FROM email_history WHERE address LIKE 'kmt_%'")
+    suspend fun purgeLegacyKmtAddresses()
+
+    @Query("DELETE FROM messages WHERE emailAddress LIKE 'kmt_%'")
+    suspend fun purgeLegacyKmtMessages()
 
     @Query("DELETE FROM messages WHERE emailAddress = :emailAddress")
     suspend fun clearMessagesForEmail(emailAddress: String)

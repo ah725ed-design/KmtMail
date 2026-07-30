@@ -177,7 +177,6 @@ fun HomeScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Mail illustration icon
                         Box(
                             modifier = Modifier
                                 .size(72.dp)
@@ -199,35 +198,6 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold,
                             color = TextWhite
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = if (isArabic) "في انتظار وصول الرسائل القادمة..." else "Waiting for incoming emails...",
-                            fontSize = 13.sp,
-                            color = TextMuted,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
-                        // Refresh button in empty state
-                        Button(
-                            onClick = { viewModel.refreshInbox() },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = DarkBackground
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (isArabic) "تحديث البريد" else "Refresh",
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
                     }
                 }
             } else {

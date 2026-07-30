@@ -14,8 +14,8 @@ import java.util.TimeZone
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-class MailTmProvider : TempMailProvider {
-    override val providerName: String = "Mail.tm"
+class MailGwProvider : TempMailProvider {
+    override val providerName: String = "Mail.gw"
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -38,7 +38,7 @@ class MailTmProvider : TempMailProvider {
     override suspend fun generateAddress(preferredDomain: String?): String = withContext(Dispatchers.IO) {
         val domains = fetchDomains()
         if (domains.isEmpty()) {
-            throw Exception("Mail.tm unavailable: no active domains")
+            throw Exception("Mail.gw unavailable: no active domains")
         }
         val domainToUse = if (preferredDomain != null && domains.contains(preferredDomain)) {
             preferredDomain
@@ -52,12 +52,12 @@ class MailTmProvider : TempMailProvider {
 
         val registered = registerAccount(email, password)
         if (!registered) {
-            throw Exception("Mail.tm account registration failed")
+            throw Exception("Mail.gw account registration failed")
         }
 
         val token = acquireToken(email, password)
         if (token.isNullOrBlank()) {
-            throw Exception("Mail.tm token acquisition failed")
+            throw Exception("Mail.gw token acquisition failed")
         }
 
         tokenMap[email] = token
@@ -69,7 +69,7 @@ class MailTmProvider : TempMailProvider {
     private fun fetchDomains(): List<String> {
         return try {
             val request = Request.Builder()
-                .url("https://api.mail.tm/domains")
+                .url("https://api.mail.gw/domains")
                 .get()
                 .build()
 
@@ -100,7 +100,7 @@ class MailTmProvider : TempMailProvider {
             }.toString()
 
             val request = Request.Builder()
-                .url("https://api.mail.tm/accounts")
+                .url("https://api.mail.gw/accounts")
                 .post(jsonPayload.toRequestBody(JSON))
                 .build()
 
@@ -120,7 +120,7 @@ class MailTmProvider : TempMailProvider {
             }.toString()
 
             val request = Request.Builder()
-                .url("https://api.mail.tm/token")
+                .url("https://api.mail.gw/token")
                 .post(jsonPayload.toRequestBody(JSON))
                 .build()
 
@@ -155,7 +155,7 @@ class MailTmProvider : TempMailProvider {
 
         try {
             val request = Request.Builder()
-                .url("https://api.mail.tm/messages")
+                .url("https://api.mail.gw/messages")
                 .header("Authorization", "Bearer $token")
                 .get()
                 .build()
@@ -175,7 +175,7 @@ class MailTmProvider : TempMailProvider {
 
                 val fromObj = item.optJSONObject("from")
                 val senderName = fromObj?.optString("name", "")?.ifBlank { fromObj.optString("address", "Unknown") } ?: "Unknown"
-                val senderEmail = fromObj?.optString("address", "unknown@mail.tm") ?: "unknown@mail.tm"
+                val senderEmail = fromObj?.optString("address", "unknown@mail.gw") ?: "unknown@mail.gw"
                 val subject = item.optString("subject", "No Subject")
                 val intro = item.optString("intro", "")
                 val createdAtStr = item.optString("createdAt", "")
@@ -188,7 +188,7 @@ class MailTmProvider : TempMailProvider {
                 }
 
                 val detailReq = Request.Builder()
-                    .url("https://api.mail.tm/messages/$msgId")
+                    .url("https://api.mail.gw/messages/$msgId")
                     .header("Authorization", "Bearer $token")
                     .get()
                     .build()
@@ -216,7 +216,7 @@ class MailTmProvider : TempMailProvider {
 
                 messagesList.add(
                     MessageEntity(
-                        id = "mailtm_$msgId",
+                        id = "mailgw_$msgId",
                         emailAddress = emailAddress,
                         senderName = senderName,
                         senderEmail = senderEmail,

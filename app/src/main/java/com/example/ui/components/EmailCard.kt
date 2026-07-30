@@ -76,7 +76,7 @@ fun EmailCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(28.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Label
@@ -118,7 +118,8 @@ fun EmailCard(
                     .clip(RoundedCornerShape(18.dp))
                     .background(Color(0xFF0F1626))
                     .border(1.dp, Color(0xFF2B3854), RoundedCornerShape(18.dp))
-                    .padding(horizontal = 18.dp, vertical = 20.dp)
+                    .padding(horizontal = 4.dp, vertical = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
                 NonWrappingEmailText(
                     email = if (emailAddress.isEmpty()) "Generating address..." else emailAddress,

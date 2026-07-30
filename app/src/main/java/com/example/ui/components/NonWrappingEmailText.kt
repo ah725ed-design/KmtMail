@@ -1,11 +1,8 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,8 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 
 /**
- * Ensures the generated temporary email address NEVER wraps onto two lines.
- * Uses single line constraint with horizontal scrolling and marquee effect.
+ * Ensures the generated temporary email address is prominent, vertically centered,
+ * occupies almost the entire width naturally, and scales dynamically down if needed.
  */
 @Composable
 fun NonWrappingEmailText(
@@ -27,27 +24,30 @@ fun NonWrappingEmailText(
     modifier: Modifier = Modifier,
     color: Color = Color.White
 ) {
-    val scrollState = rememberScrollState()
+    val fontSize = when {
+        email.length <= 22 -> 24.sp
+        email.length <= 26 -> 21.sp
+        email.length <= 30 -> 18.sp
+        email.length <= 35 -> 15.sp
+        else -> 13.sp
+    }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState),
-        contentAlignment = Alignment.CenterStart
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = email,
-            color = color,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Clip,
-            modifier = Modifier.basicMarquee(
-                iterations = Int.MAX_VALUE,
-                initialDelayMillis = 1500
+        SelectionContainer {
+            Text(
+                text = email,
+                color = color,
+                fontSize = fontSize,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily.Default,
+                maxLines = 1,
+                softWrap = false,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
             )
-        )
+        }
     }
 }

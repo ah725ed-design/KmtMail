@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Glow Circle (Subtle Radial Gradient) -->
+    <path
+        android:pathData="M54,18 A36,36 0 1 0 54,90 A36,36 0 1 0 54,18 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="36"
+                android:startX="54"
+                android:startY="54"
+                android:endX="54"
+                android:endY="90">
+                <item android:offset="0.0" android:color="#3A38BDF8"/>
+                <item android:offset="1.0" android:color="#0038BDF8"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Main Mail Envelope Body -->
+    <path
+        android:pathData="M28,36 H80 C84.4,36 88,39.6 88,44 V68 C88,72.4 84.4,76 80,76 H28 C23.6,76 20,72.4 20,68 V44 C20,39.6 23.6,36 28,36 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="20"
+                android:startY="36"
+                android:endX="88"
+                android:endY="76">
+                <item android:offset="0.0" android:color="#1E293B"/>
+                <item android:offset="1.0" android:color="#0F172A"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Envelope Flap / Top Fold -->
+    <path
+        android:pathData="M22,38.5 L51.2,58 C52.9,59.1 55.1,59.1 56.8,58 L86,38.5"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="22"
+                android:startY="38.5"
+                android:endX="86"
+                android:endY="58">
+                <item android:offset="0.0" android:color="#38BDF8"/>
+                <item android:offset="1.0" android:color="#60A5FA"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Envelope Border / Stroke -->
+    <path
+        android:pathData="M28,36 H80 C84.4,36 88,39.6 88,44 V68 C88,72.4 84.4,76 80,76 H28 C23.6,76 20,72.4 20,68 V44 C20,39.6 23.6,36 28,36 Z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#38BDF8"/>
+
+    <!-- Shield Badge Icon in bottom right corner -->
+    <path
+        android:pathData="M66,54 C66,54 74,51 82,54 V66 C82,75 74,80 74,80 C74,80 66,75 66,66 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="66"
+                android:startY="51"
+                android:endX="82"
+                android:endY="80">
+                <item android:offset="0.0" android:color="#38BDF8"/>
+                <item android:offset="1.0" android:color="#2563EB"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Checkmark inside Shield -->
+    <path
+        android:pathData="M70,66 L73,69 L78,63"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+</vector>

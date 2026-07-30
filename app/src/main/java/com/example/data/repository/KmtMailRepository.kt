@@ -18,9 +18,11 @@ class KmtMailRepository(
     val providerManager: ProviderManager = ProviderManager()
 ) {
     init {
-        // Purge any lingering mock/fake messages from previous app versions
-        kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
+        // Purge any lingering mock/fake messages and legacy kmt_ addresses from previous app versions
+        GlobalScope.launch(Dispatchers.IO) {
             try {
+                dao.purgeLegacyKmtAddresses()
+                dao.purgeLegacyKmtMessages()
                 dao.purgeNonApiMessages()
             } catch (e: Exception) {
                 // Ignore
@@ -31,35 +33,50 @@ class KmtMailRepository(
     val currentEmailFlow: Flow<EmailHistoryEntity?> = dao.getCurrentEmailFlow()
     val historyFlow: Flow<List<EmailHistoryEntity>> = dao.getAllHistory()
     val activeProviderNameFlow: StateFlow<String> = providerManager.currentProviderName
+    val selectedProviderPreferenceFlow: StateFlow<String> = providerManager.selectedProviderPreference
+
+    fun setPreferredProvider(providerName: String) {
+        providerManager.setPreferredProvider(providerName)
+    }
+
+    suspend fun getDynamicDomains(): List<String> = withContext(Dispatchers.IO) {
+        providerManager.getActiveDomains()
+    }
 
     fun getMessagesForEmail(email: String): Flow<List<MessageEntity>> {
         return dao.getMessagesForEmail(email)
     }
 
-    suspend fun generateNewEmail(preferredDomain: String = "kmtmail.com"): String = withContext(Dispatchers.IO) {
+    suspend fun generateNewEmail(preferredDomain: String? = null): Result<String> = withContext(Dispatchers.IO) {
         val failoverResult = providerManager.generateAddressWithFailover(preferredDomain)
-        val newAddress = failoverResult.getOrDefault(
-            "kmt_${(1..6).map { "abcdefghijklmnopqrstuvwxyz0123456789".random() }.joinToString("")}@$preferredDomain"
-        )
+        if (failoverResult.isFailure) {
+            return@withContext Result.failure(
+                failoverResult.exceptionOrNull() ?: Exception("جميع مزودي البريد غير متاحين حالياً")
+            )
+        }
+
+        val newAddress = failoverResult.getOrNull()
+            ?: return@withContext Result.failure(Exception("جميع مزودي البريد غير متاحين حالياً"))
+
+        val domain = newAddress.substringAfter("@", preferredDomain ?: "mailtm.com")
 
         dao.resetCurrentFlags()
         val entity = EmailHistoryEntity(
             address = newAddress,
             createdAt = System.currentTimeMillis(),
             isCurrent = true,
-            domain = preferredDomain
+            domain = domain
         )
         dao.insertEmailHistory(entity)
 
-        // Immediately connect to active provider to fetch real inbox
+        // Fetch inbox from real API
         fetchAndSyncMessages(newAddress)
 
-        return@withContext newAddress
+        return@withContext Result.success(newAddress)
     }
 
     suspend fun fetchAndSyncMessages(emailAddress: String): Result<Int> = withContext(Dispatchers.IO) {
         try {
-            // Poll using active provider with failover support
             val providerResult = providerManager.fetchMessagesWithFailover(emailAddress)
             if (providerResult.isFailure) {
                 return@withContext Result.failure(providerResult.exceptionOrNull() ?: Exception("Unknown error"))
@@ -72,7 +89,7 @@ class KmtMailRepository(
 
             return@withContext Result.success(remoteMessages.size)
         } catch (e: Exception) {
-            return@withContext Result.failure(Exception("لا توجد خدمة بريد متاحة حالياً، حاول مرة أخرى بعد قليل."))
+            return@withContext Result.failure(Exception("جميع مزودي البريد غير متاحين حالياً"))
         }
     }
 

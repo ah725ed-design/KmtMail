@@ -13,7 +13,7 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 class SecMailProvider : TempMailProvider {
-    override val providerName: String = "1SecMail API"
+    override val providerName: String = "1SecMail"
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -24,18 +24,23 @@ class SecMailProvider : TempMailProvider {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
+    override suspend fun getAvailableDomains(): List<String> = withContext(Dispatchers.IO) {
+        fetchActiveDomains()
+    }
+
     override suspend fun generateAddress(preferredDomain: String?): String = withContext(Dispatchers.IO) {
         val activeDomains = fetchActiveDomains()
+        if (activeDomains.isEmpty()) {
+            throw Exception("1SecMail unavailable: no active domains")
+        }
         val domainToUse = if (preferredDomain != null && activeDomains.contains(preferredDomain)) {
             preferredDomain
-        } else if (activeDomains.isNotEmpty()) {
-            activeDomains.random()
         } else {
-            "1secmail.com"
+            activeDomains.random()
         }
 
-        val randomChars = (1..7).map { "abcdefghijklmnopqrstuvwxyz0123456789".random() }.joinToString("")
-        return@withContext "kmt_$randomChars@$domainToUse"
+        val randomChars = (1..9).map { "abcdefghijklmnopqrstuvwxyz0123456789".random() }.joinToString("")
+        return@withContext "$randomChars@$domainToUse"
     }
 
     private fun fetchActiveDomains(): List<String> {
@@ -131,7 +136,7 @@ class SecMailProvider : TempMailProvider {
                 }
             }
         } catch (e: Exception) {
-            // Failure propagates empty list to trigger failover if needed
+            // Failure propagates empty list
         }
 
         return@withContext messagesList

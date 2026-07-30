@@ -50,11 +50,9 @@ fun KmtMailTopAppBar(
             ) {
                 // KmtMail logo icon
                 Image(
-                    painter = painterResource(id = R.drawable.kmtmail_app_icon_1785403375720),
+                    painter = painterResource(id = R.drawable.ic_kmtmail_logo),
                     contentDescription = "KmtMail Logo",
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                    modifier = Modifier.size(36.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
