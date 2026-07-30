@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KmtMail</string>
+    <string name="temporary_email">بريد مؤقت</string>
+    <string name="copy_email">نسخ البريد</string>
+    <string name="new_address">عنوان جديد</string>
+    <string name="copied_to_clipboard">تم نسخ البريد الإلكتروني</string>
+    <string name="inbox">البريد الوارد</string>
+    <string name="no_emails_yet">لا توجد رسائل حتى الآن</string>
+    <string name="refresh">تحديث</string>
+    <string name="auto_refresh_in">تحديث تلقائي خلال %1$d ثواني</string>
+    <string name="settings">الإعدادات</string>
+    <string name="language">اللغة</string>
+    <string name="dark_mode">الوضع الداكن</string>
+    <string name="clear_inbox">مسح البريد الوارد</string>
+    <string name="generate_new_address">إنشاء عنوان جديد</string>
+    <string name="about">حول التطبيق</string>
+    <string name="contact_developer">التواصل مع المطور</string>
+    <string name="developer_name">أحمد أسعد</string>
+    <string name="developer_phone">01271203502</string>
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="active">نشط</string>
+</resources>

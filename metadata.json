@@ -1,0 +1,6 @@
+{
+  "name": "KmtMail",
+  "description": "Temporary email generator with a modern dark theme, instant message inbox, and custom address controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

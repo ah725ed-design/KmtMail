@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KmtMail</string>
+    <string name="temporary_email">Temporary Email</string>
+    <string name="copy_email">Copy Email</string>
+    <string name="new_address">New Address</string>
+    <string name="copied_to_clipboard">Email copied to clipboard</string>
+    <string name="inbox">Inbox</string>
+    <string name="no_emails_yet">No emails yet</string>
+    <string name="refresh">Refresh</string>
+    <string name="auto_refresh_in">Auto sync in %1$ds</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="clear_inbox">Clear Inbox</string>
+    <string name="generate_new_address">Generate New Address</string>
+    <string name="about">About App</string>
+    <string name="contact_developer">Contact Developer</string>
+    <string name="developer_name">Ahmed Asaad</string>
+    <string name="developer_phone">01271203502</string>
+    <string name="arabic">Arabic</string>
+    <string name="english">English</string>
+    <string name="active">ACTIVE</string>
+</resources>
