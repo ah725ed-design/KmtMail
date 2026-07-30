@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.MessageEntity
 import com.example.data.repository.KmtMailRepository
+import com.example.ui.components.InteractiveEmailContent
 import com.example.ui.theme.AccentRed
 import com.example.ui.theme.DarkBackground
 import com.example.ui.theme.DarkCard
@@ -241,11 +242,9 @@ fun EmailDetailsScreen(
                             .fillMaxWidth()
                             .padding(20.dp)
                     ) {
-                        Text(
-                            text = currentMessage.bodyText,
-                            fontSize = 15.sp,
-                            color = TextWhite,
-                            lineHeight = 24.sp
+                        InteractiveEmailContent(
+                            bodyText = currentMessage.bodyText,
+                            bodyHtml = currentMessage.bodyHtml
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))

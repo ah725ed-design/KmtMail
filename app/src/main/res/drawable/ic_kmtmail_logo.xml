@@ -6,77 +6,105 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Subtle Blue Glow behind the envelope -->
+    <!-- Soft Glow behind the envelope -->
     <path
-        android:pathData="M54,12 A42,42 0 1 0 54,96 A42,42 0 1 0 54,12 Z">
+        android:pathData="M54,16 A40,40 0 1 0 54,96 A40,40 0 1 0 54,16 Z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:type="radial"
                 android:centerX="54"
-                android:centerY="54"
-                android:gradientRadius="42"
+                android:centerY="56"
+                android:gradientRadius="40"
                 android:startX="54"
-                android:startY="54"
+                android:startY="56"
                 android:endX="54"
                 android:endY="96">
-                <item android:offset="0.0" android:color="#4D5E7CE2"/>
-                <item android:offset="0.5" android:color="#1F5E7CE2"/>
-                <item android:offset="1.0" android:color="#005E7CE2"/>
+                <item android:offset="0.0" android:color="#554E73F5"/>
+                <item android:offset="0.6" android:color="#204E73F5"/>
+                <item android:offset="1.0" android:color="#004E73F5"/>
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Main Mail Envelope Body -->
+    <!-- Main Envelope Outer Rounded Base Body -->
     <path
-        android:pathData="M29,30 H79 C83.4,30 87,33.6 87,38 V70 C87,74.4 83.4,78 79,78 H29 C24.6,78 21,74.4 21,70 V38 C21,33.6 24.6,30 29,30 Z">
+        android:pathData="M32,33 H76 C81.5,33 86,37.5 86,43 V65 C86,70.5 81.5,75 76,75 H32 C26.5,75 22,70.5 22,65 V43 C22,37.5 26.5,33 32,33 Z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:type="linear"
-                android:startX="21"
-                android:startY="30"
-                android:endX="87"
-                android:endY="78">
-                <item android:offset="0.0" android:color="#1B2233"/>
-                <item android:offset="1.0" android:color="#0D1322"/>
+                android:startX="22"
+                android:startY="33"
+                android:endX="86"
+                android:endY="75">
+                <item android:offset="0.0" android:color="#68B3FF"/>
+                <item android:offset="1.0" android:color="#4B8DF8"/>
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Bottom Inner Fold Accent Seams -->
+    <!-- Lower Left Envelope Triangular Fold Panel -->
     <path
-        android:pathData="M23,75.5 L46,58 M85,75.5 L62,58"
-        android:strokeWidth="2.5"
-        android:strokeColor="#305E7CE2"
-        android:strokeLineCap="round"/>
-
-    <!-- Envelope Flap / Top V-Fold -->
-    <path
-        android:pathData="M23,32.5 L51.5,55.5 C53.1,56.8 54.9,56.8 56.5,55.5 L85,32.5"
-        android:strokeWidth="4.0"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round">
-        <aapt:attr name="android:strokeColor">
+        android:pathData="M22,75 L54,52 L22,43 V65 C22,70.5 26.5,75 32,75 Z">
+        <aapt:attr name="android:fillColor">
             <gradient
                 android:type="linear"
-                android:startX="23"
-                android:startY="32.5"
-                android:endX="85"
-                android:endY="55.5">
-                <item android:offset="0.0" android:color="#5E7CE2"/>
-                <item android:offset="0.5" android:color="#8CB8FF"/>
-                <item android:offset="1.0" android:color="#38BDF8"/>
+                android:startX="22"
+                android:startY="43"
+                android:endX="54"
+                android:endY="75">
+                <item android:offset="0.0" android:color="#5FA8FF"/>
+                <item android:offset="1.0" android:color="#4385F5"/>
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Envelope Outer Border -->
+    <!-- Lower Right Envelope Triangular Fold Panel -->
     <path
-        android:pathData="M29,30 H79 C83.4,30 87,33.6 87,38 V70 C87,74.4 83.4,78 79,78 H29 C24.6,78 21,74.4 21,70 V38 C21,33.6 24.6,30 29,30 Z"
-        android:strokeWidth="3.2"
-        android:strokeColor="#5E7CE2"/>
+        android:pathData="M86,75 L54,52 L86,43 V65 C86,70.5 81.5,75 76,75 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="43"
+                android:endX="86"
+                android:endY="75">
+                <item android:offset="0.0" android:color="#529BFF"/>
+                <item android:offset="1.0" android:color="#3A7CEB"/>
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- Flap Center Accent Dot -->
+    <!-- Bottom Envelope Center Fold Seam -->
     <path
-        android:pathData="M54,58 A2,2 0 1 0 54,54 A2,2 0 1 0 54,58 Z"
-        android:fillColor="#8CB8FF"/>
+        android:pathData="M22,75 L54,52 L86,75"
+        android:strokeWidth="1.2"
+        android:strokeColor="#356BC9"/>
+
+    <!-- Top V-Flap (Darker Royal Blue Fold with rounded bottom tip) -->
+    <path
+        android:pathData="M22,43 C22,37.5 26.5,33 32,33 H76 C81.5,33 86,37.5 86,43 L56.5,54.8 C55,55.5 53,55.5 51.5,54.8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="22"
+                android:startY="33"
+                android:endX="86"
+                android:endY="56">
+                <item android:offset="0.0" android:color="#4F73F5"/>
+                <item android:offset="1.0" android:color="#3D5FD9"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Flap Soft Edge Shadow Line -->
+    <path
+        android:pathData="M22,43 L51.5,54.8 C53,55.5 55,55.5 56.5,54.8 L86,43"
+        android:strokeWidth="1.5"
+        android:strokeColor="#2E48B0"/>
+
+    <!-- Outer Border Highlight for Crisp Small Display -->
+    <path
+        android:pathData="M32,33 H76 C81.5,33 86,37.5 86,43 V65 C86,70.5 81.5,75 76,75 H32 C26.5,75 22,70.5 22,65 V43 C22,37.5 26.5,33 32,33 Z"
+        android:strokeWidth="1.2"
+        android:strokeColor="#78BDFF"/>
 </vector>
