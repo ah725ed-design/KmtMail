@@ -46,10 +46,14 @@ import com.example.ui.theme.SurfaceBorder
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextWhite
 
+import androidx.compose.material3.CircularProgressIndicator
+
 @Composable
 fun EmailCard(
     emailAddress: String,
     onNewAddressClick: () -> Unit,
+    isArabic: Boolean = false,
+    isGenerating: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -59,7 +63,8 @@ fun EmailCard(
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Temporary Email", emailAddress)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(context, "Email copied to clipboard!", Toast.LENGTH_SHORT).show()
+            val msg = if (isArabic) "تم نسخ البريد الإلكتروني للحافظة" else "Email copied to clipboard!"
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -86,7 +91,7 @@ fun EmailCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "TEMPORARY EMAIL",
+                    text = if (isArabic) "بريد مؤقت" else "TEMPORARY EMAIL",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = SecondaryBlue,
@@ -101,7 +106,7 @@ fun EmailCard(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "● ACTIVE",
+                        text = if (isArabic) "● نشط" else "● ACTIVE",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF34D399)
@@ -122,7 +127,9 @@ fun EmailCard(
                 contentAlignment = Alignment.Center
             ) {
                 NonWrappingEmailText(
-                    email = if (emailAddress.isEmpty()) "Generating address..." else emailAddress,
+                    email = if (emailAddress.isEmpty()) {
+                        if (isArabic) "جاري إنشاء البريد..." else "Generating address..."
+                    } else emailAddress,
                     color = TextWhite
                 )
             }
@@ -137,6 +144,7 @@ fun EmailCard(
                 // Copy Email Button
                 Button(
                     onClick = onCopyClick,
+                    enabled = emailAddress.isNotEmpty() && !isGenerating,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
@@ -153,7 +161,7 @@ fun EmailCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Copy Email",
+                        text = if (isArabic) "نسخ البريد" else "Copy Email",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -162,6 +170,7 @@ fun EmailCard(
                 // New Address Button
                 OutlinedButton(
                     onClick = onNewAddressClick,
+                    enabled = !isGenerating,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
@@ -172,19 +181,34 @@ fun EmailCard(
                     ),
                     border = androidx.compose.foundation.BorderStroke(2.dp, SecondaryBlue)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "New Address",
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "New Address",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
-                    )
+                    if (isGenerating) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = PrimaryBlue,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isArabic) "جاري التغيير..." else "Generating...",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryBlue
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "New Address",
+                            tint = PrimaryBlue,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isArabic) "تغيير البريد" else "New Address",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryBlue
+                        )
+                    }
                 }
             }
         }

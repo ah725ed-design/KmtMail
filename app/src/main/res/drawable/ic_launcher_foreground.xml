@@ -1,8 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:width="72dp"
-        android:height="72dp"
-        android:drawable="@drawable/ic_kmtmail_logo"
-        android:gravity="center" />
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Ambient Glow behind Envelope -->
+    <path
+        android:pathData="M54,22 A36,28 0 1 0 54,78 A36,28 0 1 0 54,22 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="36"
+                android:startX="54"
+                android:startY="54"
+                android:endX="54"
+                android:endY="78">
+                <item android:offset="0.0" android:color="#404B6DEB"/>
+                <item android:offset="0.7" android:color="#154B6DEB"/>
+                <item android:offset="1.0" android:color="#00111826"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Base Envelope / Lower Center Light Panel -->
+    <path
+        android:pathData="M25,35 H83 V67 C83,70.3 80.3,73 77,73 H31 C27.7,73 25,70.3 25,67 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="35"
+                android:endX="54"
+                android:endY="73">
+                <item android:offset="0.0" android:color="#82C2FF"/>
+                <item android:offset="1.0" android:color="#68B0FF"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Lower Left Fold Panel -->
+    <path
+        android:pathData="M25,35 L54,53 L31,73 C27.7,73 25,70.3 25,67 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="25"
+                android:startY="35"
+                android:endX="54"
+                android:endY="73">
+                <item android:offset="0.0" android:color="#6CB1FF"/>
+                <item android:offset="1.0" android:color="#5297F7"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Lower Right Fold Panel -->
+    <path
+        android:pathData="M83,35 L54,53 L77,73 C80.3,73 83,70.3 83,67 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="83"
+                android:startY="35"
+                android:endX="54"
+                android:endY="73">
+                <item android:offset="0.0" android:color="#60A6FF"/>
+                <item android:offset="1.0" android:color="#498DF0"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner Seam Lines -->
+    <path
+        android:pathData="M25,35 L54,53 L83,35"
+        android:strokeWidth="1.0"
+        android:strokeColor="#3F7FE0"/>
+
+    <!-- Top Flap (Royal/Periwinkle Blue) -->
+    <path
+        android:pathData="M25,35 H83 L57.2,54.8 C55.3,56.2 52.7,56.2 50.8,54.8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="35"
+                android:endX="54"
+                android:endY="56">
+                <item android:offset="0.0" android:color="#5B7DF8"/>
+                <item android:offset="1.0" android:color="#4A6CEB"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Flap Shadow / Edge Line -->
+    <path
+        android:pathData="M25,35 L50.8,54.8 C52.7,56.2 55.3,56.2 57.2,54.8 L83,35"
+        android:strokeWidth="1.2"
+        android:strokeColor="#2C48B0"/>
+</vector>

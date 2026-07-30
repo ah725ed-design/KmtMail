@@ -105,21 +105,11 @@ fun SettingsScreen(
                     navigationIconContentColor = PrimaryBlue
                 ),
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_kmtmail_logo),
-                            contentDescription = "KmtMail Logo",
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = if (isArabic) "إعدادات KmtMail" else "KmtMail Settings",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = if (isArabic) "الإعدادات" else "Settings",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
@@ -335,7 +325,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "العربية (تلقائي / Default)",
+                                text = "العربية",
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = TextWhite

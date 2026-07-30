@@ -60,14 +60,13 @@ class KmtMailRepository(
 
         val domain = newAddress.substringAfter("@", preferredDomain ?: "mailtm.com")
 
-        dao.resetCurrentFlags()
         val entity = EmailHistoryEntity(
             address = newAddress,
             createdAt = System.currentTimeMillis(),
             isCurrent = true,
             domain = domain
         )
-        dao.insertEmailHistory(entity)
+        dao.createNewCurrentEmail(entity)
 
         // Fetch inbox from real API
         fetchAndSyncMessages(newAddress)
@@ -110,8 +109,7 @@ class KmtMailRepository(
     }
 
     suspend fun switchEmail(address: String) = withContext(Dispatchers.IO) {
-        dao.resetCurrentFlags()
-        dao.setCurrentEmail(address)
+        dao.createNewCurrentEmailAddress(address)
     }
 
     suspend fun deleteEmailHistory(address: String) = withContext(Dispatchers.IO) {
@@ -126,7 +124,7 @@ class KmtMailRepository(
         fun getInstance(context: Context): KmtMailRepository {
             return INSTANCE ?: synchronized(this) {
                 val db = KmtMailDatabase.getDatabase(context)
-                val repo = KmtMailRepository(db.kmtMailDao())
+                val repo = KmtMailRepository(db.kmtMailDao(), ProviderManager(context.applicationContext))
                 INSTANCE = repo
                 repo
             }

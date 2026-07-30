@@ -189,79 +189,11 @@ fun InteractiveEmailContent(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val (annotatedString, detectedUrls) = remember(bodyText, bodyHtml) {
+    val (annotatedString, _) = remember(bodyText, bodyHtml) {
         parseMessageContent(bodyText, bodyHtml)
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // If verification or action links are detected, show a prominent banner card at the top
-        if (detectedUrls.isNotEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(SecondaryBlue.copy(alpha = 0.25f))
-                    .border(1.dp, PrimaryBlue.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                    .padding(14.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Link,
-                        contentDescription = "Links Found",
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (detectedUrls.size == 1) "Verification Link Detected" else "${detectedUrls.size} Links Detected",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextWhite
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                detectedUrls.forEach { url ->
-                    Button(
-                        onClick = { openExternalUrl(context, url) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 3.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryBlue,
-                            contentColor = TextWhite
-                        )
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.OpenInNew,
-                                contentDescription = "Open Link",
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Open Link: ${url.take(40)}${if (url.length > 40) "..." else ""}",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
         // Email Body Text with clickable inline links
         if (annotatedString.text.isNotBlank()) {
             ClickableText(

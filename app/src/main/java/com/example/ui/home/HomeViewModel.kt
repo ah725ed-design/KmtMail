@@ -1,6 +1,7 @@
 package com.example.ui.home
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.local.MessageEntity
@@ -35,6 +36,7 @@ data class HomeUiState(
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = KmtMailRepository.getInstance(application)
+    private val prefs = application.getSharedPreferences("kmtmail_prefs", Context.MODE_PRIVATE)
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -42,6 +44,25 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var autoRefreshJob: Job? = null
 
     init {
+        val savedLangStr = prefs.getString("key_language", null)
+        val savedLang = if (savedLangStr != null) {
+            runCatching { AppLanguage.valueOf(savedLangStr) }.getOrDefault(AppLanguage.ARABIC)
+        } else {
+            val sysLang = java.util.Locale.getDefault().language
+            if (sysLang.lowercase().startsWith("ar")) AppLanguage.ARABIC else AppLanguage.ENGLISH
+        }
+
+        val savedProvider = prefs.getString("key_preferred_provider", "Auto") ?: "Auto"
+        val savedDarkMode = prefs.getBoolean("key_dark_mode", true)
+
+        _uiState.value = _uiState.value.copy(
+            language = savedLang,
+            preferredProvider = savedProvider,
+            isDarkMode = savedDarkMode
+        )
+
+        repository.setPreferredProvider(savedProvider)
+
         observeCurrentEmail()
         observeActiveProvider()
         observePreferredProvider()
@@ -76,6 +97,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setPreferredProvider(providerName: String) {
+        prefs.edit().putString("key_preferred_provider", providerName).apply()
         repository.setPreferredProvider(providerName)
         _uiState.value = _uiState.value.copy(preferredProvider = providerName)
         loadDynamicDomains()
@@ -88,7 +110,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     if (historyEntity?.address?.startsWith("kmt_") == true) {
                         repository.deleteEmailHistory(historyEntity.address)
                     }
-                    generateNewAddress()
+                    if (_uiState.value.currentEmail.isBlank()) {
+                        generateNewAddress()
+                    }
                 } else {
                     _uiState.value = _uiState.value.copy(
                         currentEmail = historyEntity.address,
@@ -110,10 +134,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setLanguage(language: AppLanguage) {
+        prefs.edit().putString("key_language", language.name).apply()
         _uiState.value = _uiState.value.copy(language = language)
     }
 
     fun setDarkMode(enabled: Boolean) {
+        prefs.edit().putBoolean("key_dark_mode", enabled).apply()
         _uiState.value = _uiState.value.copy(isDarkMode = enabled)
     }
 

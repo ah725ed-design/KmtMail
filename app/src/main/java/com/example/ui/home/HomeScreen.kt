@@ -81,7 +81,9 @@ fun HomeScreen(
             // Main Email Card
             EmailCard(
                 emailAddress = uiState.currentEmail,
-                onNewAddressClick = { viewModel.generateNewAddress() }
+                onNewAddressClick = { viewModel.generateNewAddress() },
+                isArabic = isArabic,
+                isGenerating = uiState.isRefreshing
             )
 
             Spacer(modifier = Modifier.height(28.dp))

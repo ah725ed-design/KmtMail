@@ -1,12 +1,15 @@
 package com.example.data.provider
 
+import android.content.Context
 import com.example.data.local.MessageEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withTimeoutOrNull
 
-class ProviderManager {
+class ProviderManager(context: Context? = null) {
+
+    private val prefs = context?.getSharedPreferences("kmtmail_prefs", Context.MODE_PRIVATE)
 
     private val mailTm = MailTmProvider()
     private val mailGw = MailGwProvider()
@@ -20,13 +23,22 @@ class ProviderManager {
         tempMail
     )
 
-    private val _selectedProviderPreference = MutableStateFlow("Auto")
+    private val initialPref = prefs?.getString("key_preferred_provider", "Auto") ?: "Auto"
+
+    private val _selectedProviderPreference = MutableStateFlow(initialPref)
     val selectedProviderPreference: StateFlow<String> = _selectedProviderPreference.asStateFlow()
 
-    private val _currentProviderName = MutableStateFlow(mailTm.providerName)
+    private val initialProviderName = if (initialPref != "Auto") {
+        allProviders.find { it.providerName.equals(initialPref, ignoreCase = true) }?.providerName ?: mailTm.providerName
+    } else {
+        mailTm.providerName
+    }
+
+    private val _currentProviderName = MutableStateFlow(initialProviderName)
     val currentProviderName: StateFlow<String> = _currentProviderName.asStateFlow()
 
     fun setPreferredProvider(providerName: String) {
+        prefs?.edit()?.putString("key_preferred_provider", providerName)?.apply()
         _selectedProviderPreference.value = providerName
         if (providerName != "Auto") {
             val matched = allProviders.find { it.providerName.equals(providerName, ignoreCase = true) }
@@ -70,7 +82,12 @@ class ProviderManager {
             }
 
             if (!address.isNullOrBlank()) {
-                _currentProviderName.value = provider.providerName
+                if (_selectedProviderPreference.value == "Auto") {
+                    _currentProviderName.value = provider.providerName
+                } else {
+                    val matched = allProviders.find { it.providerName.equals(_selectedProviderPreference.value, ignoreCase = true) }
+                    _currentProviderName.value = matched?.providerName ?: provider.providerName
+                }
                 return Result.success(address)
             }
         }
@@ -89,7 +106,9 @@ class ProviderManager {
             }
 
             if (messages != null) {
-                _currentProviderName.value = provider.providerName
+                if (_selectedProviderPreference.value == "Auto") {
+                    _currentProviderName.value = provider.providerName
+                }
                 return Result.success(messages)
             }
         }

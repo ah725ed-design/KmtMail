@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -62,4 +63,16 @@ interface KmtMailDao {
 
     @Query("DELETE FROM email_history WHERE address = :address")
     suspend fun deleteHistoryAddress(address: String)
+
+    @Transaction
+    suspend fun createNewCurrentEmail(email: EmailHistoryEntity) {
+        resetCurrentFlags()
+        insertEmailHistory(email)
+    }
+
+    @Transaction
+    suspend fun createNewCurrentEmailAddress(address: String) {
+        resetCurrentFlags()
+        setCurrentEmail(address)
+    }
 }
